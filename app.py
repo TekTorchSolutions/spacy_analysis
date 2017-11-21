@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from flask import request
+import time
 
 from flask import Flask
 from flask import make_response
@@ -18,6 +19,7 @@ for l in file:
     city=city.lower()
     cities.append(city)
 pickle.dump(cities,open("data/cities.p","wb"))
+"""
 """
 def check_cities(words):
     c=[]
@@ -58,3 +60,81 @@ if __name__ == '__main__':
     print("Starting app on port %d" % port)
 
     app.run(debug=False, port=port, host='0.0.0.0')
+
+"""""
+
+import datetime
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    info={}
+    info["case1"]={}
+    phase=["Morning","Noon","Evening"]
+    months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+    req = request.get_json(silent=True, force=True)
+    text = req.get("text")
+    l=text.split()
+    print(l)
+    last_int=""
+    data=pd.read_csv("data/airports.csv")
+    cities=data.ix[:,2].values
+    i=1
+    for word in l:
+        if word in cities:
+
+            if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
+                i=i+1
+                info["case" + str(i)] = {}
+
+
+        if word in cities:
+            if "source" in info["case"+str(i)].keys():
+                info["case"+str(i)]["destination"]=word
+            else:
+
+            #info["case"+str(i)]={}
+                info["case"+str(i)]["source"]=word
+
+
+        try:
+            datetime.datetime.strptime(word, '%d/%m/%Y')
+            info["case"+str(i)]["date"]=word
+        except ValueError:
+            pass
+
+        try:
+            time.strptime(word,"%H:%M")
+            if "time" in info["case" + str(i)].keys():
+                info["case" + str(i)]["max_time"] = word
+            else:
+                info["case" + str(i)]["time"] = word
+
+        except ValueError:
+            pass
+
+
+        if word in phase:
+            info["case"+str(i)]["period_of_day"]=word
+        else:
+            pass
+
+        if word.isdigit():
+            last_int=word
+
+        if word in months:
+            info["case" + str(i)]["date"] = last_int+word
+
+
+    res=json.dumps(info)
+    r = make_response(res)
+    r.headers['Content-Type'] = 'application/json'
+    return r
+
+if __name__ == '__main__':
+    port = int(os.getenv('PORT', 5000))
+
+    print("Starting app on port %d" % port)
+
+    app.run(debug=False, port=port, host='0.0.0.0')
+
+
+
