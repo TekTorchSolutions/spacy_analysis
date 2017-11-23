@@ -69,12 +69,12 @@ def webhook():
     info={}
     info["case1"]={}
     phase=["morning","noon","evening"]
-    months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
-    city2iata, partial_names, cities=get_info()
+    months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","may","june","july","august","september","october","november","december"]
+    iata2city, partial_names, cities=get_info()
     req = request.get_json(silent=True, force=True)
     text = req.get("text")
     text=text.lower()
-    l=text.split()
+    l=splitted_text(text)
     print(l)
     last_int=""
     #data=pd.read_csv("data/airports.csv")
@@ -96,20 +96,20 @@ def webhook():
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=word
 
-        if word in city2iata.keys():
+        if word in iata2city.keys():
 
             if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
                 i=i+1
                 info["case" + str(i)] = {}
 
 
-        if word in city2iata.keys():
+        if word in iata2city.keys():
             if "source" in info["case"+str(i)].keys():
-                info["case"+str(i)]["destination"]=city2iata[word]
+                info["case"+str(i)]["destination"]=iata2city[word]
             else:
 
             #info["case"+str(i)]={}
-                info["case"+str(i)]["source"]=city2iata[word]
+                info["case"+str(i)]["source"]=iata2city[word]
 
         if word in partial_names.keys():
 
@@ -162,10 +162,24 @@ def webhook():
     return r
 
 def get_info():
-    city2iata, partial_names, cities=pickle.load(open("data/short_names_and_iata.p","rb"))
-    return city2iata,partial_names,cities
+    iata2city, partial_names, cities=pickle.load(open("data/short_names_and_iata_1.p","rb"))
+    return iata2city,partial_names,cities
 
+def mysplit(s):
+    head = s.rstrip('abcdefghijklmnopqrstuvwxyz')
+    tail = s[len(head):]
+    return head, tail
 
+def splitted_text(text):
+    splitted_txt = []
+    for s in text.split():
+        if any(i.isdigit() for i in s):
+            head, tail = mysplit(s)
+            splitted_txt.append(head)
+            splitted_txt.append(tail)
+        else:
+            splitted_txt.append(s)
+    return splitted_txt
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
 
