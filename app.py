@@ -68,7 +68,7 @@ import datetime
 def webhook():
     info={}
     info["case1"]={}
-    phase=["Morning","Noon","Evening"]
+    phase=["morning","noon","evening"]
     months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
     city2iata, partial_names, cities=get_info()
     req = request.get_json(silent=True, force=True)
