@@ -70,13 +70,15 @@ def webhook():
     info["case1"]={}
     phase=["Morning","Noon","Evening"]
     months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+    city2iata, partial_names, cities=get_info()
     req = request.get_json(silent=True, force=True)
     text = req.get("text")
+    text=text.lower()
     l=text.split()
     print(l)
     last_int=""
-    data=pd.read_csv("data/airports.csv")
-    cities=data.ix[:,2].values
+    #data=pd.read_csv("data/airports.csv")
+    #cities=data.ix[:,2].values
     i=1
     for word in l:
         if word in cities:
@@ -93,6 +95,36 @@ def webhook():
 
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=word
+
+        if word in city2iata.keys():
+
+            if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
+                i=i+1
+                info["case" + str(i)] = {}
+
+
+        if word in city2iata.keys():
+            if "source" in info["case"+str(i)].keys():
+                info["case"+str(i)]["destination"]=city2iata[word]
+            else:
+
+            #info["case"+str(i)]={}
+                info["case"+str(i)]["source"]=city2iata[word]
+
+        if word in partial_names.keys():
+
+            if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
+                i=i+1
+                info["case" + str(i)] = {}
+
+
+        if word in partial_names.keys():
+            if "source" in info["case"+str(i)].keys():
+                info["case"+str(i)]["destination"]=partial_names[word]
+            else:
+
+            #info["case"+str(i)]={}
+                info["case"+str(i)]["source"]=partial_names[word]
 
 
         try:
@@ -128,6 +160,11 @@ def webhook():
     r = make_response(res)
     r.headers['Content-Type'] = 'application/json'
     return r
+
+def get_info():
+    city2iata, partial_names, cities=pickle.load(open("data/short_names_and_iata.p","rb"))
+    return city2iata,partial_names,cities
+
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
