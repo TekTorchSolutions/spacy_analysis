@@ -68,9 +68,10 @@ import datetime
 def webhook():
     info={}
     info["case1"]={}
-    phase=["morning","noon","evening"]
+    phase=["morning","noon","evening","night"]
     months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","may","june","july","august","september","october","november","december"]
-    iata2city, partial_names, cities=get_info()
+    airlines=["indigo","jet","spice"]
+    iata2city, partial_names, cities,spaced_cities=get_info()
     req = request.get_json(silent=True, force=True)
     text = req.get("text")
     text=text.lower()
@@ -80,7 +81,12 @@ def webhook():
     #data=pd.read_csv("data/airports.csv")
     #cities=data.ix[:,2].values
     i=1
+    word_index=0
+    combined_word=""
     for word in l:
+        if word_index<len(l)-1:
+            combined_word=l[word_index]+" "+l[word_index+1]
+
         if word in cities:
 
             if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
@@ -95,6 +101,21 @@ def webhook():
 
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=word
+
+        if combined_word in spaced_cities:
+
+            if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
+                i=i+1
+                info["case" + str(i)] = {}
+
+
+        if combined_word in spaced_cities:
+            if "source" in info["case"+str(i)].keys():
+                info["case"+str(i)]["destination"]=combined_word
+            else:
+
+            #info["case"+str(i)]={}
+                info["case"+str(i)]["source"]=combined_word
 
         if word in iata2city.keys():
 
@@ -135,13 +156,29 @@ def webhook():
 
         try:
             time.strptime(word,"%H:%M")
+            if word_index<len(l)-1:
+                if l[word_index+1]=="am" or l[word_index+1]=="pm":
+                    word=word+" "+l[word_index+1]
             if "time" in info["case" + str(i)].keys():
                 info["case" + str(i)]["max_time"] = word
+
             else:
                 info["case" + str(i)]["time"] = word
 
         except ValueError:
             pass
+
+        try:
+            if len(word)==4:
+                time.strptime(word,"%H%M")
+                if word !="2017" and word !="2018":
+                    if "time" in info["case" + str(i)].keys():
+                        info["case" + str(i)]["max_time"] = word
+                    else:
+                        info["case" + str(i)]["time"] = word
+
+        except ValueError:
+                pass
 
 
         if word in phase:
@@ -153,7 +190,15 @@ def webhook():
             last_int=word
 
         if word in months:
+            if "date" in info["case"+str(i)].keys():
+                i = i + 1
+                info["case" + str(i)] = {}
             info["case" + str(i)]["date"] = last_int+word
+        word_index=word_index+1
+
+        if word in airlines and "airline" not in info["case" + str(i)].keys() :
+            info["case" + str(i)]["airline"] = word
+
 
 
     res=json.dumps(info)
@@ -162,8 +207,8 @@ def webhook():
     return r
 
 def get_info():
-    iata2city, partial_names, cities=pickle.load(open("data/short_names_and_iata_1.p","rb"))
-    return iata2city,partial_names,cities
+    iata2city, partial_names, cities,spaced_cities=pickle.load(open("data/short_names_and_iata_1.p","rb"))
+    return iata2city,partial_names,cities,spaced_cities
 
 def mysplit(s):
     head = s.rstrip('abcdefghijklmnopqrstuvwxyz')
@@ -172,14 +217,28 @@ def mysplit(s):
 
 def splitted_text(text):
     splitted_txt = []
-    for s in text.split():
+    for s in split_into_words(text):
         if any(i.isdigit() for i in s):
             head, tail = mysplit(s)
             splitted_txt.append(head)
             splitted_txt.append(tail)
         else:
             splitted_txt.append(s)
+    splitted_txt = list(filter(None, splitted_txt))
+
     return splitted_txt
+
+def split_into_words(sentence):
+    #expression for splitting
+    _WORD_SPLIT = re.compile("([-.,!?\"';)<>(])")
+    #to store words
+    words=[]
+    #first split by space
+    for space_separated_fragment in sentence.strip().split():
+        #and then split by expression
+        words.extend(_WORD_SPLIT.split(space_separated_fragment))
+    return words
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
 

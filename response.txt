@@ -1,0 +1,181 @@
+Email-
+Hi
+ 
+Please book the following tickets for
+ 
+Mr. STEFAN GROENING
+Mrs JUTTA GROENING
+ 
+5-Nov-2017     Mum – Ahm – Indigo – 7:35am arrv 8:50
+5-Nov-2017     Ahm – Mum – Indigo – 18:40 – arrv 20:05
+ 
+Regards
+Maryann
+
+Response:
+{
+    "case2": {
+        "source": "Ahmedabad",
+        "max_time": "20:05",
+        "airline": "indigo",
+        "destination": "Mumbai",
+        "time": "18:40",
+        "date": "5nov"
+    },
+    "case1": {
+        "source": "Mumbai",
+        "max_time": "8:50",
+        "airline": "indigo",
+        "destination": "Ahmedabad",
+        "time": "7:35 am",
+        "date": "5nov"
+    }
+}
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+Email-
+
+Hi,
+
+
+Please provide fare:
+ 
+ 
+9W 592 11NOV BOM-BAH Dep  1945 Arr 2115
+GF 056 12NOV BAH-BOM Dep  2255 Arr 0455
+Regards,
+
+
+Response:
+{
+    "case2": {
+        "max_time": "0455",
+        "destination": "mumbai",
+        "time": "2255",
+        "source": "bahrain",
+        "date": "12nov"
+    },
+    "case1": {
+        "max_time": "2115",
+        "destination": "bahrain",
+        "time": "1945",
+        "source": "mumbai",
+        "date": "11nov"
+    }
+}
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Email-
+
+HI Trupti,
+ 
+Please book
+Mum – Goa
+Indigo – 3:15pm
+ 
+Goa – Mum
+Indigo – 2:35
+ 
+There are 2 tickets to be booked:
+
+Response:
+
+{
+    "case2": {
+        "airline": "indigo",
+        "destination": "Mumbai",
+        "time": "2:35",
+        "source": "goa"
+    },
+    "case1": {
+        "airline": "indigo",
+        "destination": "goa",
+        "time": "3:15 pm",
+        "source": "Mumbai"
+    }
+}
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Email-
+
+Dear Venessa,
+ 
+Please provide me below details :
+ 
+Name : Mohd Mohtashim
+Delhi to Lucknow 16/11/2017 Evening between 16:00 to 18:00
+Lucknow to Delhi 18/11/2017 Noon between 12:00 to 15:00
+ 
+Thanks & Regards,
+Rupa Bhatt
+
+Response-
+
+{
+    "case2": {
+        "period_of_day": "noon",
+        "source": "lucknow",
+        "max_time": "15:00",
+        "destination": "delhi",
+        "time": "12:00",
+        "date": "18/11/2017"
+    },
+    "case1": {
+        "period_of_day": "evening",
+        "source": "delhi",
+        "max_time": "18:00",
+        "destination": "lucknow",
+        "time": "16:00",
+        "date": "16/11/2017"
+    }
+}
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Dear Venessa,
+ 
+Please provide me below details :
+ 
+Mumbai to Bangalore 14/11/2017 morning 9:00
+ 
+Thanks & Regards,
+Rupa Bhatt
+
+Response-
+
+{
+    "case1": {
+        "period_of_day": "morning",
+        "destination": "bangalore",
+        "time": "9:00",
+        "source": "mumbai",
+        "date": "14/11/2017"
+    }
+}
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Email-
+
+Please give me a flight fare for 
+LA to New York on 15 th dec 
+New York to LA on 2 nd jan 
+
+Regards,
+Rochelle Chhabra 
+
+Response-
+
+{
+    "case2": {
+        "destination": "Los Angeles",
+        "source": "new york",
+        "date": "2jan"
+    },
+    "case1": {
+        "destination": "new york",
+        "source": "Los Angeles",
+        "date": "15dec"
+    }
+}

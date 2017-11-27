@@ -40,14 +40,18 @@ for ap in airport:
     cities_iata.append(ap.split(",")[0].lower())
 for i in range(100):
     iata2city[iata[i].lower()]=cities_iata[i]
+iata2city['bah']="bahrain"
 print(iata2city)
 print(cities)
 cities.append("mumbai")
+cities.append("bahrain")
 partial_names={}
 partial_names["mum"]="Mumbai"
 partial_names["ahm"]="Ahmedabad"
 partial_names["ny"]="New York"
 partial_names["la"]="Los Angeles"
-obj=[iata2city,partial_names,cities]
+
+spaced_cities=["new york","los angeles","las vegas"]
+obj=[iata2city,partial_names,cities,spaced_cities]
 
 pickle.dump(obj,open("data/short_names_and_iata_1.p","wb"))
