@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from flask import request
 import time
+from flask_cors import CORS
+
 
 from flask import Flask
 from flask import make_response
@@ -11,6 +13,8 @@ import re
 import os
 
 app = Flask(__name__)
+CORS(app)
+
 """
 file=open("data/cities.txt","r")
 cities=[]
