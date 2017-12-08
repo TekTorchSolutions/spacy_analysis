@@ -74,8 +74,15 @@ def webhook():
     info["case1"]={}
     phase=["morning","noon","evening","night"]
     months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","may","june","july","august","september","october","november","december"]
+    month_dict={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12,"january":1,"february":2,"march":3,"april":4,"june":6,"july":7,"august":8,"september":9,"october":10,"november":11,"december":12}
     airlines=["indigo","jet","spice"]
     iata2city, partial_names, cities,spaced_cities=get_info()
+    city2iata={city:iata for iata,city in iata2city.items()}
+    city2iata['bangalore']="BLR"
+    city2iata['delhi']='DEL'
+    city2iata['mumbai']="BOM"
+    city2iata["lucknow"]="LKO"
+    print(city2iata)
     req = request.get_json(silent=True, force=True)
     text = req.get("text")
     text=text.lower()
@@ -101,10 +108,18 @@ def webhook():
         if word in cities:
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=word
+                try:
+                    info["case" + str(i)]["destination_code"] = city2iata[word].upper()
+                except:
+                    pass
             else:
 
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=word
+                try:
+                    info["case" + str(i)]["source_code"] = city2iata[word].upper()
+                except:
+                    pass
 
         if combined_word in spaced_cities:
 
@@ -116,11 +131,18 @@ def webhook():
         if combined_word in spaced_cities:
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=combined_word
+                try:
+                    info["case"+str(i)]["destination_code"]=city2iata[combined_word].upper()
+                except:
+                    pass
             else:
 
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=combined_word
-
+                try:
+                    info["case" + str(i)]["source_code"] = city2iata[combined_word].upper()
+                except:
+                    pass
         if word in iata2city.keys():
 
             if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
@@ -131,10 +153,18 @@ def webhook():
         if word in iata2city.keys():
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=iata2city[word]
+                try:
+                    info["case" + str(i)]["destination_code"] = word.upper()
+                except:
+                    pass
             else:
 
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=iata2city[word]
+                try:
+                    info["case" + str(i)]["source_code"] = word.upper()
+                except:
+                    pass
 
         if word in partial_names.keys():
 
@@ -146,15 +176,32 @@ def webhook():
         if word in partial_names.keys():
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=partial_names[word]
+                try:
+                    info["case" + str(i)]["destination_code"] = city2iata[partial_names[word].lower()].upper()
+                except:
+                    pass
             else:
 
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=partial_names[word]
+                try:
+                    info["case" + str(i)]["source_code"] = city2iata[partial_names[word].lower()].upper()
+                except:
+                    pass
 
 
         try:
             datetime.datetime.strptime(word, '%d/%m/%Y')
+
             info["case"+str(i)]["date"]=word
+            split_date=word.split("/")
+            if split_date[2]=='18' or split_date[2]=='2018':
+                str_date='2018-'+split_date[1]+"-"+split_date[0]
+                info["case" + str(i)]["date"] = str_date
+            else:
+                str_date = '2017-' + split_date[1] + "-" + split_date[0]
+                info["case" + str(i)]["date"] = str_date
+
         except ValueError:
             pass
 
@@ -197,7 +244,16 @@ def webhook():
             if "date" in info["case"+str(i)].keys():
                 i = i + 1
                 info["case" + str(i)] = {}
+
             info["case" + str(i)]["date"] = last_int+word
+            if word=="dec"or word=="december":
+                date_str="2017-12"+"-"+str(last_int)
+                info["case" + str(i)]["date"] = date_str
+            else:
+                date_str="2018-"+str(month_dict[word])+"-"+str(last_int)
+                info["case" + str(i)]["date"] = date_str
+
+
         word_index=word_index+1
 
         if word in airlines and "airline" not in info["case" + str(i)].keys() :
