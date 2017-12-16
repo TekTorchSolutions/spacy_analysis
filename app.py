@@ -3,7 +3,7 @@ import pandas as pd
 from flask import request
 import time
 from flask_cors import CORS
-
+from pymongo import MongoClient
 
 from flask import Flask
 from flask import make_response
@@ -260,7 +260,7 @@ def webhook():
             info["case" + str(i)]["airline"] = word
 
 
-
+    send_to_db(text,str(info))
     res=json.dumps(info)
     r = make_response(res)
     r.headers['Content-Type'] = 'application/json'
@@ -299,6 +299,26 @@ def split_into_words(sentence):
         words.extend(_WORD_SPLIT.split(space_separated_fragment))
     return words
 
+
+
+def send_to_db(request_text="",response_text=""):
+    print("Connecting")
+    client = MongoClient("mongodb://jas1994:biology12@ds133476.mlab.com:33476/adroint_logs")
+    print("Connected")
+
+    db = client['adroint_logs']
+    print("Sending")
+
+
+    collection=db["plain_logs_direct"]
+    db_dict = {
+            "req": request_text,
+            "resp": response_text,
+
+
+        }
+    collection.insert(db_dict)
+    print("Sent")
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
 
