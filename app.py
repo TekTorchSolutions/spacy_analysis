@@ -76,8 +76,9 @@ def webhook():
     months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","may","june","july","august","september","october","november","december"]
     month_dict={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12,"january":1,"february":2,"march":3,"april":4,"june":6,"july":7,"august":8,"september":9,"october":10,"november":11,"december":12}
     airlines=["indigo","jet","spice"]
-    iata2city, partial_names, cities,spaced_cities=get_info()
-    city2iata={city:iata for iata,city in iata2city.items()}
+    iata2city, partial_names, cities,spaced_cities,city2iata=get_info()
+    #city2iata={city:iata for iata,city in iata2city.items()}
+
     city2iata['bangalore']="BLR"
     city2iata['delhi']='DEL'
     city2iata['mumbai']="BOM"
@@ -268,7 +269,8 @@ def webhook():
 
 def get_info():
     iata2city, partial_names, cities,spaced_cities=pickle.load(open("data/short_names_and_iata_1.p","rb"))
-    return iata2city,partial_names,cities,spaced_cities
+    city2iata=pickle.load(open("data/city2iata.p","rb"))
+    return iata2city,partial_names,cities,spaced_cities,city2iata
 
 def mysplit(s):
     head = s.rstrip('abcdefghijklmnopqrstuvwxyz')
