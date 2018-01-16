@@ -60,13 +60,23 @@ pickle.dump(obj,open("data/short_names_and_iata_1.p","wb"))
 import pandas as pd
 import pickle
 df=pd.read_csv("data/airports_large.csv")
+#print(df.head())
 city=df.iloc[:, 2].values
 airport_code=df.iloc[:, 4].values
-print(len(city))
-print(len(airport_code))
+airport=df.iloc[:,1].values
+
+
 #city2code=dict(zip(city,airport_code))
 city2iata={}
+city2airport={}
 for i in range(len(city)):
     city2iata[str(city[i]).lower()]=airport_code[i]
+    city2airport[str(city[i]).lower()] = airport[i]
 print(city2iata["hyderabad"])
-pickle.dump(city2iata,open("data/city2iata.p","wb"))
+print(city2airport["london"])
+iata2city, partial_names, cities, spaced_cities = pickle.load(open("data/short_names_and_iata_1.p", "rb"))
+print(len(iata2city))
+
+#pickle.dump(city2iata,open("data/city2iata.p","wb"))
+#pickle.dump(city2airport,open("data/city2airport.p","wb"))
+
