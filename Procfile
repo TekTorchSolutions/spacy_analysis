@@ -1,1 +1,1 @@
-web: python adroint_app/app.py
+web: python app.py
