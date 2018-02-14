@@ -12,7 +12,7 @@ import pickle
 import re
 import os
 
-from adroint_unstructured.core_logic import solve
+from spacy_analysis.adroint_unstructured.core_logic import solve
 app = Flask(__name__)
 CORS(app)
 
