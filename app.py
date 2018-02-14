@@ -12,7 +12,7 @@ import pickle
 import re
 import os
 
-from adroint_unstructured import core_logic
+from adroint_unstructured.core_logic import solve
 app = Flask(__name__)
 CORS(app)
 
@@ -351,7 +351,7 @@ def check_for_second_opinion(info):
     return False
 
 def get_second_opinion(text):
-    info=core_logic.solve(text)
+    info=solve(text)
     return info
 
 def compare_opinions(structured_info,unstructured_info):
