@@ -37,3 +37,7 @@ wrapt==1.10.11
 xlrd==1.1.0
 flask-cors
 pymongo
+parsedatetime
+spacy==2.0.5
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz
+pandas
