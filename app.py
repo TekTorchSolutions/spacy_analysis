@@ -12,6 +12,7 @@ import pickle
 import re
 import os
 
+from adroint_unstructured.core import solve
 app = Flask(__name__)
 CORS(app)
 
@@ -86,8 +87,8 @@ def webhook():
     print(city2iata)
     req = request.get_json(silent=True, force=True)
     text = req.get("text")
-    text=text.lower()
-    l=splitted_text(text)
+    small_text=text.lower()
+    l=splitted_text(small_text)
     print(l)
     last_int=""
     #data=pd.read_csv("data/airports.csv")
@@ -268,9 +269,16 @@ def webhook():
         if word in airlines and "airline" not in info["case" + str(i)].keys() :
             info["case" + str(i)]["airline"] = word
 
+    print(check_for_second_opinion(info))
+    if check_for_second_opinion(info):
+        unstructured_info=get_second_opinion(text)
+        print(unstructured_info)
+        final_info=compare_opinions(info,unstructured_info)
+    else:
+        final_info=info
 
-    send_to_db(text,str(info))
-    res=json.dumps(info)
+    #send_to_db(text,str(final_info))
+    res=json.dumps(final_info)
     r = make_response(res)
     r.headers['Content-Type'] = 'application/json'
     return r
@@ -331,12 +339,67 @@ def send_to_db(request_text="",response_text=""):
         }
     collection.insert(db_dict)
     print("Sent")
+
+
+def check_for_second_opinion(info):
+    for case, struct in info.items():
+        if "date" in struct.keys():
+            continue
+        else:
+            return True
+
+    return False
+
+def get_second_opinion(text):
+    info=solve(text)
+    return info
+
+def compare_opinions(structured_info,unstructured_info):
+    structured_score=0
+    unstructured_score=0
+    for case, struct in structured_info.items():
+        if "date" in struct.keys():
+            structured_score=structured_score+1
+
+        else:
+            continue
+    for case, struct in unstructured_info.items():
+        if "date" in struct.keys():
+            unstructured_score = unstructured_score + 1
+
+        else:
+            continue
+
+    if structured_score >= unstructured_score:
+        print(structured_score)
+        return structured_info
+    else:
+        unstructured_info=enhance_unstructured_output(unstructured_info)
+        return unstructured_info
+
+
+def enhance_unstructured_output(unstructured_info):
+    iata2city, partial_names, cities, spaced_cities, city2iata, city2airport = get_info()
+    for case,struct in unstructured_info.items():
+        if "source" in struct.keys():
+
+            struct["source_code"]=city2iata[struct["source"].lower()].upper()
+            struct["source_airport"]=city2airport[struct["source"].lower()]
+        if "destination" in struct.keys():
+            struct["destination_code"]=city2iata[struct["destination"].lower()].upper()
+            struct["destination_airport"]=city2airport[struct["destination"].lower()]
+
+    return unstructured_info
+
+
+
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
 
     print("Starting app on port %d" % port)
 
-    app.run(debug=False, port=port, host='0.0.0.0')
+    app.run(debug=True, port=port, host='0.0.0.0')
 
 
 

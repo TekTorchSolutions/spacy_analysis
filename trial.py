@@ -73,9 +73,10 @@ for i in range(len(city)):
     city2iata[str(city[i]).lower()]=airport_code[i]
     city2airport[str(city[i]).lower()] = airport[i]
 print(city2iata["hyderabad"])
-print(city2airport["london"])
+print(city2airport["mexico"])
 iata2city, partial_names, cities, spaced_cities = pickle.load(open("data/short_names_and_iata_1.p", "rb"))
 print(len(iata2city))
+
 
 #pickle.dump(city2iata,open("data/city2iata.p","wb"))
 #pickle.dump(city2airport,open("data/city2airport.p","wb"))
