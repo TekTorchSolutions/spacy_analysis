@@ -77,6 +77,9 @@ def webhook():
     month_dict={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12,"january":1,"february":2,"march":3,"april":4,"june":6,"july":7,"august":8,"september":9,"october":10,"november":11,"december":12}
     airlines=["indigo","jet","spice"]
     iata2city, partial_names, cities,spaced_cities,city2iata,city2airport=get_info()
+    spaced_cities.append("san francisco")
+    city_2_all_airports, city_2_default_iata, airport2iata = pickle.load(open("data/city_airport_iata.p", "rb"))
+    iata2airport = {v: k for k, v in airport2iata.items()}
     #city2iata={city:iata for iata,city in iata2city.items()}
 
     city2iata['bangalore']="BLR"
@@ -110,8 +113,11 @@ def webhook():
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=word
                 try:
-                    info["case" + str(i)]["destination_code"] = city2iata[word].upper()
-                    info["case" + str(i)]["destination_airport"] = city2airport[word]
+                    #info["case" + str(i)]["destination_code"] = city2iata[word].upper()
+                    #info["case" + str(i)]["destination_airport"] = city2airport[word]
+                    iata,airport=get_iata_from_destination(word,small_text)
+                    info["case" + str(i)]["destination_code"] = iata.upper()
+                    info["case" + str(i)]["destination_airport"] = airport
                 except:
                     pass
             else:
@@ -119,8 +125,11 @@ def webhook():
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=word
                 try:
-                    info["case" + str(i)]["source_code"] = city2iata[word].upper()
-                    info["case" + str(i)]["source_airport"] = city2airport[word]
+                    #info["case" + str(i)]["source_code"] = city2iata[word].upper()
+                    #info["case" + str(i)]["source_airport"] = city2airport[word]
+                    iata, airport = get_iata_from_destination(word, small_text)
+                    info["case" + str(i)]["source_code"] = iata.upper()
+                    info["case" + str(i)]["source_airport"] = airport
                 except:
                     pass
 
@@ -135,8 +144,11 @@ def webhook():
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=combined_word
                 try:
-                    info["case"+str(i)]["destination_code"]=city2iata[combined_word].upper()
-                    info["case" + str(i)]["destination_airport"] = city2airport[word]
+                    #info["case"+str(i)]["destination_code"]=city2iata[combined_word].upper()
+                    #info["case" + str(i)]["destination_airport"] = city2airport[word]
+                    iata, airport = get_iata_from_destination(combined_word, small_text)
+                    info["case" + str(i)]["destination_code"] = iata.upper()
+                    info["case" + str(i)]["destination_airport"] = airport
                 except:
                     pass
             else:
@@ -144,23 +156,29 @@ def webhook():
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=combined_word
                 try:
-                    info["case" + str(i)]["source_code"] = city2iata[combined_word].upper()
-                    info["case" + str(i)]["source_airport"] = city2airport[word]
+                    #info["case" + str(i)]["source_code"] = city2iata[combined_word].upper()
+                    #info["case" + str(i)]["source_airport"] = city2airport[word]
+                    iata, airport = get_iata_from_destination(combined_word, small_text)
+                    info["case" + str(i)]["source_code"] = iata.upper()
+                    info["case" + str(i)]["source_airport"] = airport
                 except:
                     pass
-        if word in iata2city.keys():
+        if word in iata2city.keys() and word is not "san":
+
 
             if "source" in info["case"+str(i)].keys() and "destination" in info["case"+str(i)].keys():
                 i=i+1
                 info["case" + str(i)] = {}
 
 
-        if word in iata2city.keys():
+        if word in iata2city.keys() and "san" not in word:
+            print(word)
+            print("sanning")
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=iata2city[word]
                 try:
                     info["case" + str(i)]["destination_code"] = word.upper()
-                    info["case" + str(i)]["destination_airport"] = city2airport[iata2city[word]]
+                    info["case" + str(i)]["destination_airport"] = iata2airport[word]
                 except:
                     pass
             else:
@@ -169,7 +187,7 @@ def webhook():
                 info["case"+str(i)]["source"]=iata2city[word]
                 try:
                     info["case" + str(i)]["source_code"] = word.upper()
-                    info["case" + str(i)]["source_airport"] = city2airport[iata2city[word]]
+                    info["case" + str(i)]["source_airport"] = iata2airport[word]
                 except:
                     pass
 
@@ -184,8 +202,11 @@ def webhook():
             if "source" in info["case"+str(i)].keys():
                 info["case"+str(i)]["destination"]=partial_names[word]
                 try:
-                    info["case" + str(i)]["destination_code"] = city2iata[partial_names[word].lower()].upper()
-                    info["case" + str(i)]["destination_airport"] = city2airport[word]
+                    #info["case" + str(i)]["destination_code"] = city2iata[partial_names[word].lower()].upper()
+                    #info["case" + str(i)]["destination_airport"] = city2airport[word]
+                    iata, airport = get_iata_from_destination(partial_names[word].lower(), small_text)
+                    info["case" + str(i)]["destination_code"] = iata.upper()
+                    info["case" + str(i)]["destination_airport"] = airport
                 except:
                     pass
             else:
@@ -193,8 +214,11 @@ def webhook():
             #info["case"+str(i)]={}
                 info["case"+str(i)]["source"]=partial_names[word]
                 try:
-                    info["case" + str(i)]["source_code"] = city2iata[partial_names[word].lower()].upper()
-                    info["case" + str(i)]["source_airport"] = city2airport[word]
+                    #info["case" + str(i)]["source_code"] = city2iata[partial_names[word].lower()].upper()
+                    #info["case" + str(i)]["source_airport"] = city2airport[word]
+                    iata, airport = get_iata_from_destination(partial_names[word].lower(), small_text)
+                    info["case" + str(i)]["source_code"] = iata.upper()
+                    info["case" + str(i)]["source_airport"] = airport
                 except:
                     pass
 
@@ -389,6 +413,37 @@ def enhance_unstructured_output(unstructured_info):
             struct["destination_airport"]=city2airport[struct["destination"].lower()]
 
     return unstructured_info
+
+def get_iata_from_destination(dest, l):
+    city_2_all_airports, city_2_default_iata, airport2iata = pickle.load(open("data/city_airport_iata.p", "rb"))
+    iata2airport= {v: k for k, v in airport2iata.items()}
+    iata = ""
+    airport_op = ""
+    if dest in city_2_all_airports.keys():
+        airports = city_2_all_airports[dest]
+        print(airports)
+        for airport in airports:
+            splitted_airport = airport.split(" ")
+            if 'airport' in splitted_airport:
+                splitted_airport.remove('airport')
+            if dest in splitted_airport:
+                splitted_airport.remove(dest)
+            airport_name = " ".join(str(x) for x in splitted_airport)
+            print(airport_name)
+            if airport_name in l and airport_name.strip() is not "":
+                iata = airport2iata[airport]
+                airport_op = airport
+                break
+            else:
+
+                continue
+        if iata is "":
+            iata = city_2_default_iata[dest]
+            airport_op=iata2airport[iata.lower()]
+
+
+    return iata,airport_op
+
 
 
 
